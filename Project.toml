@@ -1,0 +1,14 @@
+name = "LoggingZMQ"
+uuid = "e9bc4a15-d3b7-45db-a26a-813125f6ff30"
+authors = ["Cas Bex <cas.bex@kuleuven.be>"]
+version = "0.1.0"
+
+[deps]
+Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
+ZMQ = "c2297ded-f4af-51ae-bb23-16f91089e4e1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
