@@ -9,6 +9,14 @@ ZMQ = "c2297ded-f4af-51ae-bb23-16f91089e4e1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
+
+[compat]
+julia = "1"
+Aqua = "0.8"
+Logging = "1"
+Test = "1"
+ZMQ = "1"
 
 [targets]
-test = ["Test"]
+test = ["Aqua", "Test"]

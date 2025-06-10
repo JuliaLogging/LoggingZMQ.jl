@@ -3,6 +3,11 @@ using LoggingZMQ
 using ZMQ
 using Test
 import Logging
+using Aqua
+
+@testset "Aqua" begin
+    Aqua.test_all(LoggingZMQ)
+end
 
 ctx = Context()
 addr = "inproc://logger"
