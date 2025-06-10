@@ -6,7 +6,15 @@ import ZMQ
 export ZMQLogger
 
 """
-Logger that sends logs data over a zmq socket.
+    ZMQLogger <: Logging.AbstractLogger
+    ZMQLogger(sock::ZMQ.Socket, min_level, message_limits)
+    ZMQLogger(sock::ZMQ.Socket, min_level=Logging.Info)
+Logger that sends logs over a zmq socket.
+
+The socket must be initialised manually. It can be any ZMQ socket type
+that suports sending without reply (PUB/PUSH and variants).
+
+The logger is **not** thread safe because ZMQ sockets are not thread safe.
 """
 struct ZMQLogger <: Logging.AbstractLogger
     sock::ZMQ.Socket
@@ -19,7 +27,7 @@ function ZMQLogger(sock, min_level, message_limits)
     return ZMQLogger(sock, ReentrantLock(), min_level, message_limits)
 end
 
-function ZMQLogger(sock, min_level)
+function ZMQLogger(sock, min_level = Logging.Info)
     return ZMQLogger(sock, ReentrantLock(), min_level, Dict{Any, Int}())
 end
 
