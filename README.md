@@ -6,6 +6,7 @@ The logger is **not** thread safe because ZMQ sockets are not thread safe.
 
 ## Usage
 ```julia
+import Logging
 using LoggingZMQ
 using ZMQ
 
@@ -20,6 +21,8 @@ logsock = Socket(ctx, PUB)
 connect(logsock, addr)
 logger = ZMQLogger(logsock, Logging.Info)
 
-@info "This is a test"
+Logging.with_logger(logger) do
+	@info "This is a test"
+end
 println(recv(receiver, String)) # This is a test
 ```
