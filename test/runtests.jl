@@ -10,8 +10,7 @@ using Aqua
 end
 
 const ctx = Context()
-const bind_addr = "inproc://testlogger"
-const connect_addr = "inproc://testlogger"
+const log_addr = "inproc://testlogger"
 const trigger_addr = "inproc://trigger"
 const timeout_sec = 30
 
@@ -20,15 +19,17 @@ function spawn_receiver(ctx, msg_list, c)
     return @spawn begin
         receiver = Socket(ctx, SUB)
         subscribe(receiver, "")
-        connect(receiver, connect_addr)
+        connect(receiver, log_addr)
+        # Indicate to the main testing code that task is ready to receive logs
+        # Without this, CI doesn't run for some reason
         trigger = Socket(ctx, REQ)
         connect(trigger, trigger_addr)
         send(trigger, "Ready")
         recv(trigger)
         for msg in msg_list
             r = recv(receiver, String)
-            println("Got: " * r)
-            println("Expected: " * msg)
+            # println("Got: " * r)
+            # println("Expected: " * msg)
             if r != msg
                 close(receiver)
                 put!(c, "Failed")
@@ -41,6 +42,7 @@ function spawn_receiver(ctx, msg_list, c)
     end
 end
 
+# cause tests to fail when timeout
 function timeout(s, c)
     sleep(s)
     return put!(c, "Timeout")
@@ -51,8 +53,10 @@ end
     test_task = spawn_receiver(ctx, ["Error", "Warning", "Info", "Debug"], c)
 
     logsock = Socket(ctx, PUB)
-    bind(logsock, bind_addr)
+    bind(logsock, log_addr)
     logger = ZMQLogger(logsock, Logging.BelowMinLevel)
+
+    # Wait until receiver indicates ok to start
     trigger = Socket(ctx, REP)
     bind(trigger, trigger_addr)
     recv(trigger)
@@ -71,6 +75,8 @@ end
     c = Channel{String}(32)
     test_task = spawn_receiver(ctx, ["Error", "Warning"], c)
     logger = ZMQLogger(logsock, Logging.Warn)
+
+    # Wait until receiver indicates ok to start
     recv(trigger)
     send(trigger, "Ok")
 
