@@ -54,7 +54,7 @@ end
 
     logsock = Socket(ctx, PUB)
     bind(logsock, log_addr)
-    logger = ZMQLogger(logsock, Logging.BelowMinLevel)
+    logger = ZMQLogger(logsock)
 
     # Wait until receiver indicates ok to start
     trigger = Socket(ctx, REP)
@@ -69,23 +69,6 @@ end
         Logging.@debug "Debug"
     end
 
-    @spawn timeout(timeout_sec, c)
-    @test take!(c) == "Ok"
-
-    c = Channel{String}(32)
-    test_task = spawn_receiver(ctx, ["Error", "Warning"], c)
-    logger = ZMQLogger(logsock, Logging.Warn)
-
-    # Wait until receiver indicates ok to start
-    recv(trigger)
-    send(trigger, "Ok")
-
-    Logging.with_logger(logger) do
-        Logging.@error "Error"
-        Logging.@warn "Warning"
-        Logging.@info "Info"
-        Logging.@debug "Debug"
-    end
     @spawn timeout(timeout_sec, c)
     @test take!(c) == "Ok"
 end

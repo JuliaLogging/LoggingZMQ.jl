@@ -19,24 +19,23 @@ The logger is **not** thread safe because ZMQ sockets are not thread safe.
 struct ZMQLogger <: Logging.AbstractLogger
     sock::ZMQ.Socket
     lock::ReentrantLock
-    min_level::Base.CoreLogging.LogLevel
     message_limits::Dict{Any, Int}
 end
 
-function ZMQLogger(sock, min_level, message_limits)
-    return ZMQLogger(sock, ReentrantLock(), min_level, message_limits)
+function ZMQLogger(sock, message_limits)
+    return ZMQLogger(sock, ReentrantLock(), message_limits)
 end
 
-function ZMQLogger(sock, min_level = Logging.Info)
-    return ZMQLogger(sock, ReentrantLock(), min_level, Dict{Any, Int}())
+function ZMQLogger(sock)
+    return ZMQLogger(sock, Dict{Any, Int}())
 end
 
 function Logging.min_enabled_level(logger::ZMQLogger)
-    return logger.min_level
+    return Logging.BelowMinLevel
 end
 
 function Logging.shouldlog(logger::ZMQLogger, level, _module, group, id)
-    return @lock logger.lock get(logger.message_limits, id, 1) > 0
+    return true
 end
 
 function Logging.catch_exceptions(::ZMQLogger)
