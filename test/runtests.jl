@@ -41,7 +41,7 @@ function timeout(s, c)
 end
 
 @testset "Main" begin
-    c = Channel{String}(2)
+    c = Channel{String}(32)
     test_task = spawn_receiver(ctx, addr, ["Error", "Warning", "Info", "Debug"], c)
 
     logsock = Socket(ctx, PUB)
@@ -58,7 +58,7 @@ end
     @spawn timeout(timeout_sec, c)
     @test take!(c) == "Ok"
 
-    c = Channel{String}(2)
+    c = Channel{String}(32)
     test_task = spawn_receiver(ctx, addr, ["Error", "Warning"], c)
     logger = ZMQLogger(logsock, Logging.Warn)
 
