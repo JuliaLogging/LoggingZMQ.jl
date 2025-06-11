@@ -25,7 +25,7 @@ on:
         default: false
     secrets:
       codecov_token:
-        required: true
+        required: false
 
 jobs:
   test:
