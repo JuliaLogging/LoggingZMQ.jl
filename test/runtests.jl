@@ -9,11 +9,12 @@ using Aqua
     Aqua.test_all(LoggingZMQ)
 end
 
-ctx = Context()
-addr = "inproc://logger"
+const ctx = Context()
+const addr = "inproc://logger"
+const timeout_sec = 30
 
 # receiver is asynchronous to prevent tests from hanging
-function spawn_receiver(ctx, addr, msg_list)
+function spawn_receiver(ctx, addr, msg_list, c)
     return @spawn begin
         receiver = Socket(ctx, SUB)
         subscribe(receiver, "")
@@ -24,16 +25,25 @@ function spawn_receiver(ctx, addr, msg_list)
             # println("Expected: " * msg)
             if r != msg
                 close(receiver)
-                return false
+                put!(c, "Failed")
+                return
             end
         end
         close(receiver)
-        return true
+        put!(c, "Ok")
+        return
     end
 end
 
+function timeout(s, c)
+    sleep(s)
+    return put!(c, "Timeout")
+end
+
 @testset "Main" begin
-    test_task = spawn_receiver(ctx, addr, ["Error", "Warning", "Info", "Debug"])
+    c = Channel{String}(2)
+    test_task = spawn_receiver(ctx, addr, ["Error", "Warning", "Info", "Debug"], c)
+
     logsock = Socket(ctx, PUB)
     bind(logsock, addr)
     logger = ZMQLogger(logsock, Logging.BelowMinLevel)
@@ -44,10 +54,12 @@ end
         Logging.@info "Info"
         Logging.@debug "Debug"
     end
-    sleep(1)
-    @test istaskdone(test_task) && fetch(test_task)
 
-    test_task = spawn_receiver(ctx, addr, ["Error", "Warning"])
+    @spawn timeout(timeout_sec, c)
+    @test take!(c) == "Ok"
+
+    c = Channel{String}(2)
+    test_task = spawn_receiver(ctx, addr, ["Error", "Warning"], c)
     logger = ZMQLogger(logsock, Logging.Warn)
 
     Logging.with_logger(logger) do
@@ -56,6 +68,6 @@ end
         Logging.@info "Info"
         Logging.@debug "Debug"
     end
-    sleep(1)
-    @test istaskdone(test_task) && fetch(test_task)
+    @spawn timeout(timeout_sec, c)
+    @test take!(c) == "Ok"
 end
