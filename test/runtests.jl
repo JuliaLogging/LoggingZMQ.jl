@@ -21,8 +21,8 @@ function spawn_receiver(ctx, addr, msg_list, c)
         connect(receiver, addr)
         for msg in msg_list
             r = recv(receiver, String)
-            # println("Got: " * r)
-            # println("Expected: " * msg)
+            println("Got: " * r)
+            println("Expected: " * msg)
             if r != msg
                 close(receiver)
                 put!(c, "Failed")
