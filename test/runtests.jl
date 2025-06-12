@@ -1,12 +1,12 @@
 import Base.Threads: @spawn
-using LoggingZMQ
+using ZMQLoggers
 using ZMQ
 using Test
 import Logging
 using Aqua
 
 @testset "Aqua" begin
-    Aqua.test_all(LoggingZMQ)
+    Aqua.test_all(ZMQLoggers)
 end
 
 const ctx = Context()
