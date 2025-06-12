@@ -1,4 +1,4 @@
-module LoggingZMQ
+module ZMQLoggers
 
 import Logging
 import ZMQ
@@ -59,4 +59,4 @@ function Logging.handle_message(logger::ZMQLogger, lvl::Logging.LogLevel, msg, _
     return nothing
 end
 
-end # module LoggingZMQ
+end # module ZMQLoggers

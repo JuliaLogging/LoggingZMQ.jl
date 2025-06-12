@@ -1,4 +1,4 @@
-name = "LoggingZMQ"
+name = "ZMQLoggers"
 uuid = "e9bc4a15-d3b7-45db-a26a-813125f6ff30"
 authors = ["Cas Bex <cas.bex@kuleuven.be>"]
 version = "0.1.0"

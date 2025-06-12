@@ -23,7 +23,7 @@ JuliaMinCIVersion: '1'
 JuliaMinVersion: '1'
 License: MIT
 LicenseCopyrightHolders: Lucas Bex
-PackageName: LoggingZMQ
+PackageName: ZMQLoggers
 PackageOwner: JuliaLogging
 PackageUUID: e9bc4a15-d3b7-45db-a26a-813125f6ff30
 RunJuliaNightlyOnCI: false
